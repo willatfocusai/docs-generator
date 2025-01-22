@@ -1,0 +1,15 @@
+// src/components/sidebar.tsx
+'use client'
+
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
+
+export function Sidebar() {
+  return (
+    <div className="w-64 border-r h-screen">
+      <ScrollArea className="h-full">
+        {/* Documentation tree structure */}
+      </ScrollArea>
+    </div>
+  )
+}
