@@ -7,6 +7,13 @@ interface RepoContent {
   type: 'file' | 'directory';
 }
 
+interface TreeItem {
+  path?: string;
+  type?: string;
+  mode?: string;
+  sha?: string;
+}
+
 export class DocumentationGenerator {
   private octokit: Octokit;
 
@@ -42,19 +49,25 @@ export class DocumentationGenerator {
 
     // Get content for each file
     for (const item of tree.tree) {
-      if (item.type === 'blob') {
-        const { data } = await this.octokit.rest.repos.getContent({
-          owner,
-          repo,
-          path: item.path,
-        });
-
-        if ('content' in data) {
-          contents.push({
-            path: item.path,
-            content: Buffer.from(data.content, 'base64').toString(),
-            type: 'file'
+      if (item.type === 'blob' && item.path) {  // Add null check for path
+        try {
+          const { data } = await this.octokit.rest.repos.getContent({
+            owner,
+            repo,
+            path: item.path,  // TypeScript now knows path is defined
           });
+
+          if ('content' in data) {
+            contents.push({
+              path: item.path,
+              content: Buffer.from(data.content, 'base64').toString(),
+              type: 'file'
+            });
+          }
+        } catch (error) {
+          console.error(`Error fetching content for ${item.path}:`, error);
+          // Continue with next file instead of breaking
+          continue;
         }
       }
     }
