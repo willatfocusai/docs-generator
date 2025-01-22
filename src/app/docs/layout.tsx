@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
+import { Side } from "@radix-ui/react-popper" // Add this import if needed
 
 export default function DocsLayout({
   children,
@@ -24,12 +25,11 @@ export default function DocsLayout({
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Sidebar */}
+      {/* Rest of the component remains the same */}
       <aside className="hidden lg:block w-64 border-r h-screen sticky top-0">
         <DocsSidebar />
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
