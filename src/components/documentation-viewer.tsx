@@ -17,8 +17,30 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export function DocumentationViewer({ documentation }) {
-  const [activeFile, setActiveFile] = useState(null)
+interface Endpoint {
+  method: string;
+  path: string;
+}
+
+interface DocumentationFile {
+  path: string;
+  endpoints: Endpoint[];
+  types: string[];
+  comments: string[];
+}
+
+interface Documentation {
+  repository: string;
+  timestamp: string | number;
+  files: DocumentationFile[];
+}
+
+interface DocumentationViewerProps {
+  documentation: Documentation;
+}
+
+export function DocumentationViewer({ documentation }: DocumentationViewerProps) {
+  const [activeFile, setActiveFile] = useState<DocumentationFile | null>(null);
 
   return (
     <div className="space-y-6">
