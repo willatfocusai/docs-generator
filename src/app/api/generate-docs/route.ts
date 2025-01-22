@@ -3,6 +3,15 @@ import { NextResponse } from 'next/server';
 import { Octokit } from 'octokit';
 import OpenAI from 'openai';
 
+interface TreeItem {
+  path?: string;
+  type?: string;
+  sha?: string;
+  url?: string;
+  size?: number;
+  mode?: string;
+}
+
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -301,8 +310,10 @@ async function processRepository(repoUrl: string) {
     });
 
     const apiFiles = data.tree
-      .filter(item => {
-        const path = item.path.toLowerCase();
+      .filter((item: TreeItem) => {
+        const path = item.path?.toLowerCase();
+        if (!path || !item.type) return false;
+        
         return item.type === 'blob' && 
                path.endsWith('.ts') && 
                (path.includes('/api/') || 
@@ -316,6 +327,11 @@ async function processRepository(repoUrl: string) {
     const processedFiles = [];
     for (const file of apiFiles) {
       try {
+        if (!file.path) {
+          console.warn('Skipping file with undefined path');
+          continue;
+        }
+
         console.log(`Processing file: ${file.path}`);
         
         const { data: fileData } = await octokit.rest.repos.getContent({
