@@ -15,10 +15,31 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body className="min-h-screen bg-background font-sans antialiased">
-        <ThemeProvider>
-          {children}
+    <html 
+      lang="en" 
+      suppressHydrationWarning 
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body className={`
+        min-h-screen 
+        bg-background 
+        font-sans 
+        antialiased 
+        flex 
+        flex-col
+      `}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="flex-1">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
