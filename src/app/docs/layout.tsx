@@ -19,8 +19,8 @@ export default function DocsLayout({
             <Menu className="h-4 w-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64">
-          <DocsSidebar />
+        <SheetContent position="left" className="w-64">
+        <DocsSidebar />
         </SheetContent>
       </Sheet>
 
