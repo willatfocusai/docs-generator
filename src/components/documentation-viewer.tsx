@@ -1,7 +1,7 @@
-// src/components/documentation-viewer.tsx
 'use client'
 
-import { useState } from 'react'
+import * as React from 'react'
+import type { ElementRef, ComponentPropsWithoutRef } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -40,7 +40,7 @@ interface DocumentationViewerProps {
 }
 
 export function DocumentationViewer({ documentation }: DocumentationViewerProps) {
-  const [activeFile, setActiveFile] = useState<DocumentationFile | null>(null);
+  const [activeFile, setActiveFile] = React.useState<DocumentationFile | null>(null);
 
   return (
     <div className="space-y-6">
@@ -54,7 +54,10 @@ export function DocumentationViewer({ documentation }: DocumentationViewerProps)
         <CardContent>
           <Accordion type="single" collapsible>
             {documentation.files.map((file, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionItem
+                key={`file-${index}`}
+                value={`file-${index}`}
+              >
                 <AccordionTrigger>
                   <span className="font-mono text-sm">{file.path}</span>
                 </AccordionTrigger>
@@ -64,7 +67,7 @@ export function DocumentationViewer({ documentation }: DocumentationViewerProps)
                     <div className="mb-4">
                       <h3 className="text-lg font-semibold mb-2">Endpoints</h3>
                       {file.endpoints.map((endpoint, i) => (
-                        <div key={i} className="p-2 border rounded-md mb-2">
+                        <div key={`endpoint-${i}`} className="p-2 border rounded-md mb-2">
                           <div className="flex items-center gap-2">
                             <Badge>{endpoint.method}</Badge>
                             <code className="text-sm">{endpoint.path}</code>
@@ -79,7 +82,7 @@ export function DocumentationViewer({ documentation }: DocumentationViewerProps)
                     <div className="mb-4">
                       <h3 className="text-lg font-semibold mb-2">Types</h3>
                       {file.types.map((type, i) => (
-                        <pre key={i} className="p-2 bg-muted rounded-md mb-2 text-sm overflow-x-auto">
+                        <pre key={`type-${i}`} className="p-2 bg-muted rounded-md mb-2 text-sm overflow-x-auto">
                           {type}
                         </pre>
                       ))}
@@ -91,7 +94,7 @@ export function DocumentationViewer({ documentation }: DocumentationViewerProps)
                     <div>
                       <h3 className="text-lg font-semibold mb-2">Documentation</h3>
                       {file.comments.map((comment, i) => (
-                        <div key={i} className="p-2 bg-muted rounded-md mb-2 text-sm whitespace-pre-wrap">
+                        <div key={`comment-${i}`} className="p-2 bg-muted rounded-md mb-2 text-sm whitespace-pre-wrap">
                           {comment}
                         </div>
                       ))}
