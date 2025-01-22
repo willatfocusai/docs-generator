@@ -273,24 +273,28 @@ const generateUsageConsiderations = (analysis: any) => {
 };
 
 export const generateExamples = (endpoint: Endpoint, analysis: any) => {
-  const { context, analysis: endpointAnalysis } = analysis;
+  if (!endpoint.path || !endpoint.methods) return [];
+
+  const { analysis: endpointAnalysis } = analysis;
   
-  return endpoint.methods?.map(method => ({
+  return endpoint.methods.map(method => ({
     method,
     examples: {
-      curl: generateCurlExample(method, endpoint.path, endpointAnalysis),
-      js: generateJavaScriptExample(method, endpoint.path, endpointAnalysis),
-      python: generatePythonExample(method, endpoint.path, endpointAnalysis)
+      curl: generateCurlExample(method, endpoint.path!, endpointAnalysis),
+      js: generateJavaScriptExample(method, endpoint.path!, endpointAnalysis),
+      python: generatePythonExample(method, endpoint.path!, endpointAnalysis)
     }
   }));
 };
 
 const generateCurlExample = (method: string, path: string, analysis: any): string => {
+  if (!path) throw new Error('Path is required for generating curl example');
+  
   const { security } = analysis;
   const headers = [
     '-H "Content-Type: application/json"',
-    security.requiresAuth ? '-H "Authorization: Bearer your-api-key"' : null,
-    security.measures.rateLimit ? '-H "X-Rate-Limit-Strategy: adaptive"' : null
+    security?.requiresAuth ? '-H "Authorization: Bearer your-api-key"' : null,
+    security?.measures?.rateLimit ? '-H "X-Rate-Limit-Strategy: adaptive"' : null
   ].filter(Boolean);
 
   return `curl -X ${method} \\
@@ -299,11 +303,14 @@ const generateCurlExample = (method: string, path: string, analysis: any): strin
 };
 
 const generateJavaScriptExample = (method: string, path: string, analysis: any): string => {
+  if (!path) throw new Error('Path is required for generating JavaScript example');
+
   const { security, dataFlow } = analysis;
-  const hasStreaming = dataFlow.hasInputStream || dataFlow.hasOutputStream;
+  const hasStreaming = dataFlow?.hasInputStream || dataFlow?.hasOutputStream;
+  const resourceName = path.split('/').pop()?.replace(/[^a-zA-Z]/g, '') || 'Resource';
   
   return `// Example with error handling and ${hasStreaming ? 'streaming ' : ''}data
-const ${method.toLowerCase()}${path.split('/').pop()?.replace(/[^a-zA-Z]/g, '') || 'Resource'} = async () => {
+const ${method.toLowerCase()}${resourceName} = async () => {
   try {
     ${hasStreaming ? generateStreamingExample(method, path) : generateStandardExample(method, path, security)}
   } catch (error) {
@@ -328,8 +335,8 @@ const generateStreamingExample = (method: string, path: string): string => {
 const generateStandardExample = (method: string, path: string, security: any): string => {
   const headers = {
     'Content-Type': 'application/json',
-    ...(security.requiresAuth && { 'Authorization': 'Bearer your-api-key' }),
-    ...(security.measures.rateLimit && { 'X-Rate-Limit-Strategy': 'adaptive' })
+    ...(security?.requiresAuth && { 'Authorization': 'Bearer your-api-key' }),
+    ...(security?.measures?.rateLimit && { 'X-Rate-Limit-Strategy': 'adaptive' })
   };
 
   return `const response = await fetch('https://api.example.com${path}', {
@@ -347,19 +354,22 @@ const generateStandardExample = (method: string, path: string, security: any): s
 };
 
 const generatePythonExample = (method: string, path: string, analysis: any): string => {
+  if (!path) throw new Error('Path is required for generating Python example');
+
   const { security, dataFlow } = analysis;
-  const hasStreaming = dataFlow.hasInputStream || dataFlow.hasOutputStream;
+  const hasStreaming = dataFlow?.hasInputStream || dataFlow?.hasOutputStream;
+  const resourceName = path.split('/').pop()?.replace(/[^a-zA-Z]/g, '') || 'resource';
 
   const headers = {
     'Content-Type': 'application/json',
-    ...(security.requiresAuth && { 'Authorization': 'Bearer your-api-key' }),
-    ...(security.measures.rateLimit && { 'X-Rate-Limit-Strategy': 'adaptive' })
+    ...(security?.requiresAuth && { 'Authorization': 'Bearer your-api-key' }),
+    ...(security?.measures?.rateLimit && { 'X-Rate-Limit-Strategy': 'adaptive' })
   };
 
   return `import requests
 ${hasStreaming ? 'from requests.exceptions import ChunkedEncodingError' : ''}
 
-def ${method.toLowerCase()}_${path.split('/').pop()?.replace(/[^a-zA-Z]/g, '') || 'resource'}():
+def ${method.toLowerCase()}_${resourceName}():
     try:
         ${hasStreaming ? 
           generatePythonStreamingExample(method, path, headers) : 
