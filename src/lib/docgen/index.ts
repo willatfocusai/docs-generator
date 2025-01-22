@@ -85,6 +85,56 @@ export class DocumentationGenerator {
     });
   }
 
+  private async generateTypeDocs(contents: RepoContent[]) {
+    const typeFiles = contents.filter(file => 
+      // Look for files that might contain type definitions
+      file.path.match(/\.(ts|d\.ts)$/) ||
+      file.path.includes('types') ||
+      file.path.includes('interfaces')
+    );
+
+    return typeFiles.map(file => {
+      // Extract type information
+      const types = this.findTypes(file.content);
+      const interfaces = this.findInterfaces(file.content);
+      const typeAliases = this.findTypeAliases(file.content);
+
+      return {
+        path: file.path,
+        types,
+        interfaces,
+        typeAliases
+      };
+    });
+  }
+
+  private findTypes(content: string) {
+    // Extract type definitions
+    const types: string[] = [];
+    
+    // Match type keywords followed by name and definition
+    const typeMatches = content.match(/type\s+\w+\s*[=<][^;]+;/g) || [];
+    types.push(...typeMatches);
+
+    // Match enum definitions
+    const enumMatches = content.match(/enum\s+\w+\s*{[^}]+}/g) || [];
+    types.push(...enumMatches);
+
+    return types;
+  }
+
+  private findInterfaces(content: string) {
+    // Extract interface definitions
+    const interfaces = content.match(/interface\s+\w+\s*{[^}]+}/g) || [];
+    return interfaces;
+  }
+
+  private findTypeAliases(content: string) {
+    // Extract type aliases
+    const aliases = content.match(/type\s+\w+\s*=\s*[^;]+;/g) || [];
+    return aliases;
+  }
+
   private findRoutes(content: string) {
     // Look for route patterns in Express/Next.js/etc
     const routes: string[] = [];
