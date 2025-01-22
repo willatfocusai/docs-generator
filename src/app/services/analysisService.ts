@@ -3,6 +3,8 @@ import type { Endpoint, File } from './types';
 
 export class AnalysisService {
   private static generateCurlExample(endpoint: Endpoint): string {
+    if (!endpoint.path) throw new Error('Endpoint path is required');
+    
     const method = endpoint.methods?.[0] || 'GET';
     const hasBody = ['POST', 'PUT', 'PATCH'].includes(method);
     
@@ -16,6 +18,8 @@ export class AnalysisService {
   }
 
   private static generateJSExample(endpoint: Endpoint): string {
+    if (!endpoint.path) throw new Error('Endpoint path is required');
+    
     const method = endpoint.methods?.[0] || 'GET';
     const hasBody = ['POST', 'PUT', 'PATCH'].includes(method);
     
@@ -35,6 +39,8 @@ export class AnalysisService {
   }
 
   private static generatePythonExample(endpoint: Endpoint): string {
+    if (!endpoint.path) throw new Error('Endpoint path is required');
+    
     const method = endpoint.methods?.[0] || 'GET';
     const hasBody = ['POST', 'PUT', 'PATCH'].includes(method);
     
@@ -64,17 +70,20 @@ export class AnalysisService {
           repoUrl: repository,
           files: files.map(file => ({
             ...file,
-            endpoints: file.endpoints?.map(endpoint => ({
-              ...endpoint,
-              examples: endpoint.methods?.map(method => ({
-                method,
-                examples: {
-                  curl: this.generateCurlExample({ ...endpoint, methods: [method] }),
-                  js: this.generateJSExample({ ...endpoint, methods: [method] }),
-                  python: this.generatePythonExample({ ...endpoint, methods: [method] })
-                }
-              }))
-            }))
+            endpoints: file.endpoints?.map(endpoint => {
+              if (!endpoint.path) return endpoint; // Skip if no path
+              return {
+                ...endpoint,
+                examples: endpoint.methods?.map(method => ({
+                  method,
+                  examples: {
+                    curl: this.generateCurlExample({ ...endpoint, methods: [method] }),
+                    js: this.generateJSExample({ ...endpoint, methods: [method] }),
+                    python: this.generatePythonExample({ ...endpoint, methods: [method] })
+                  }
+                }))
+              };
+            })
           }))
         })
       });
@@ -88,17 +97,20 @@ export class AnalysisService {
       // Process and enhance the response
       const enhancedFiles = documentation.files.map((file: File) => ({
         ...file,
-        endpoints: file.endpoints?.map(endpoint => ({
-          ...endpoint,
-          examples: endpoint.methods?.map(method => ({
-            method,
-            examples: {
-              curl: this.generateCurlExample({ ...endpoint, methods: [method] }),
-              js: this.generateJSExample({ ...endpoint, methods: [method] }),
-              python: this.generatePythonExample({ ...endpoint, methods: [method] })
-            }
-          }))
-        }))
+        endpoints: file.endpoints?.map(endpoint => {
+          if (!endpoint.path) return endpoint; // Skip if no path
+          return {
+            ...endpoint,
+            examples: endpoint.methods?.map(method => ({
+              method,
+              examples: {
+                curl: this.generateCurlExample({ ...endpoint, methods: [method] }),
+                js: this.generateJSExample({ ...endpoint, methods: [method] }),
+                python: this.generatePythonExample({ ...endpoint, methods: [method] })
+              }
+            }))
+          };
+        })
       }));
 
       console.log('Analysis complete');
