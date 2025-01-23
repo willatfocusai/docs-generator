@@ -4,17 +4,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
-import { useTheme } from "next-themes"
 
 export default function DocsLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const { theme } = useTheme()
-
   return (
-    <div className="flex min-h-screen" data-theme={theme}>
+    <div className="flex min-h-screen">
       {/* Mobile Navigation Trigger */}
       <Sheet>
         <SheetTrigger asChild className="lg:hidden fixed top-4 left-4">
