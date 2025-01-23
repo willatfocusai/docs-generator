@@ -8,8 +8,14 @@ const nextConfig = {
   images: {
     domains: [],
   },
-  // Ensure proper transpilation
-  transpilePackages: []
+  // Add necessary packages for transpilation
+  transpilePackages: ["@radix-ui", "geist"],
+  
+  // Add webpack configuration for proper module resolution
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, path: false }
+    return config
+  }
 }
 
 module.exports = nextConfig

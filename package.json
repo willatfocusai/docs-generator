@@ -43,6 +43,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@shadcn/ui": "^0.0.4",
     "@types/babel__code-frame": "^7.0.6",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__parser": "^7.1.1",
@@ -54,6 +55,8 @@
     "@types/react-syntax-highlighter": "^15.5.11",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
+    "postcss-import": "^16.1.0",
+    "postcss-nesting": "^13.0.1",
     "typescript": "^5.3.3"
   }
 }
